@@ -10,14 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import static java.lang.Math.round;
+
 public class Task2Activity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private TextView txt;
-
-    private float[] gravity;
-    private float[] linear_acceleration;
+    private double[] gravity = {0,0,0} ;
+    private double[] linear_acceleration = {0,0,0};
 
 
     @Override
@@ -31,14 +32,29 @@ public class Task2Activity extends AppCompatActivity implements SensorEventListe
 
         txt = findViewById(R.id.txt_x);
 
+
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        final float alpha = (float) 0.8;
+
 
 
         synchronized (this) {
+
+            double x_raw = event.values[0];
+            double y_raw = event.values[1];
+            double z_raw = event.values[2];
+
+            final float alpha = (float) 0.8;
+
+            gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+            gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+            gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
+
+            linear_acceleration[0] = event.values[0] - gravity[0];
+            linear_acceleration[1] = event.values[1] - gravity[1];
+            linear_acceleration[2] = event.values[2] - gravity[2];
 
 
             switch (event.sensor.getType()){
@@ -46,9 +62,15 @@ public class Task2Activity extends AppCompatActivity implements SensorEventListe
                 case Sensor.TYPE_LINEAR_ACCELERATION:
 
                     txt.setText(
-                            "acceleration x:"+Float.toString(event.values[0])+"\n"+
-                            "acceleration y:"+Float.toString(event.values[1]) + "\n" +
-                            "acceleration z:"+Float.toString(event.values[2]));
+                            "acceleration x:"+x_raw+"\n"+
+                            "acceleration y:"+y_raw + "\n" +
+                            "acceleration z:"+z_raw + "\n"+
+
+                            "clear x:"+linear_acceleration[0]+"\n"+
+                            "clear y:"+linear_acceleration[1] + "\n" +
+                            "clear z:"+linear_acceleration[2] + "\n"
+                    );
+
 
                     break;
 
